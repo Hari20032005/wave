@@ -1,0 +1,9 @@
+<resources>
+    <!-- Dark window background prevents a white flash on cold start —
+         late-night dark mode is the primary context (Design Psychology #7). -->
+    <style name="Theme.Stillwater" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/deep_water</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

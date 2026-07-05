@@ -1,0 +1,5 @@
+<resources>
+    <!-- Mirrors DeepWater in ui/theme/Color.kt — keep in sync. -->
+    <color name="deep_water">#0F1714</color>
+    <color name="seafoam">#8FB8A5</color>
+</resources>
