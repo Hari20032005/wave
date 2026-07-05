@@ -4,6 +4,12 @@
     <!-- No INTERNET permission: the app is on-device-only by design (Principle 1).
          Adding it later would be a deliberate, reviewed decision. -->
 
+    <!-- Calming haptic rhythm in the SOS flow (normal permission, auto-granted). -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Quick-access shortcut; requested at runtime AFTER the in-app
+         prominent-disclosure screen (Principle 5). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".StillwaterApplication"
         android:allowBackup="false"
@@ -15,12 +21,25 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Stillwater">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".widget.SosWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/sos_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

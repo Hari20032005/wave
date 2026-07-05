@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.stillwater.app.ui.home.HomeScreen
+import com.stillwater.app.ui.home.NotificationDisclosureScreen
 import com.stillwater.app.ui.onboarding.OnboardingScreen
 import com.stillwater.app.ui.sos.SosScreen
 import com.stillwater.app.ui.theme.Motion
@@ -20,7 +21,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable data object OnboardingRoute
 @Serializable data object HomeRoute
-@Serializable data object SosRoute
+@Serializable data class SosRoute(val entryPoint: String = "IN_APP")
+@Serializable data object NotificationDisclosureRoute
 
 @Composable
 fun StillwaterNavHost(
@@ -48,10 +50,17 @@ fun StillwaterNavHost(
             )
         }
         composable<HomeRoute> {
-            HomeScreen(onStartSos = { navController.navigate(SosRoute) })
+            HomeScreen(
+                onStartSos = { navController.navigate(SosRoute(entryPoint = "IN_APP")) },
+                onLogSlip = { navController.navigate(SosRoute(entryPoint = "RETRO_LOG")) },
+                onSetupQuickAccess = { navController.navigate(NotificationDisclosureRoute) },
+            )
         }
         composable<SosRoute> {
             SosScreen(onClose = { navController.popBackStack() })
+        }
+        composable<NotificationDisclosureRoute> {
+            NotificationDisclosureScreen(onDone = { navController.popBackStack() })
         }
     }
 }

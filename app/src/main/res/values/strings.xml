@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Stillwater</string>
+    <string name="widget_label">Stillwater SOS</string>
+    <string name="widget_description">One quiet tap to the urge SOS flow.</string>
 </resources>

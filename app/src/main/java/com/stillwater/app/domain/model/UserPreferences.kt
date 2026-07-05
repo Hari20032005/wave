@@ -30,6 +30,8 @@ data class UserPreferences(
     /** Mean of the moral-incongruence items, 1..5. Null if screen not shown. */
     val moralIncongruenceScore: Float? = null,
     val framing: Framing = Framing.HABIT_CHANGE,
+    /** Whether the quiet quick-access notification is enabled. */
+    val quickAccessEnabled: Boolean = false,
 )
 
 /** A value the user chose to protect. Stored in Room (`user_value`). */

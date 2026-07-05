@@ -28,6 +28,7 @@ class UserPreferencesRepository @Inject constructor(
         val COMMON_MOODS = stringSetPreferencesKey("common_moods")
         val MORAL_INCONGRUENCE = floatPreferencesKey("moral_incongruence")
         val FRAMING = stringPreferencesKey("framing")
+        val QUICK_ACCESS_ENABLED = booleanPreferencesKey("quick_access_enabled")
     }
 
     val userPreferences: Flow<UserPreferences> = dataStore.data.map { prefs ->
@@ -40,7 +41,12 @@ class UserPreferencesRepository @Inject constructor(
             framing = prefs[Keys.FRAMING]
                 ?.let { runCatching { Framing.valueOf(it) }.getOrNull() }
                 ?: Framing.HABIT_CHANGE,
+            quickAccessEnabled = prefs[Keys.QUICK_ACCESS_ENABLED] ?: false,
         )
+    }
+
+    suspend fun setQuickAccessEnabled(enabled: Boolean) {
+        dataStore.edit { prefs -> prefs[Keys.QUICK_ACCESS_ENABLED] = enabled }
     }
 
     /** Single atomic write at the end of onboarding. */

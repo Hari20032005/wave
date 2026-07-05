@@ -74,6 +74,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.compose.material.icons.extended)
 
     testImplementation(libs.junit)
