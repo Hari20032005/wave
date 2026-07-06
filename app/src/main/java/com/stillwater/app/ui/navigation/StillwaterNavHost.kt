@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import com.stillwater.app.ui.home.HomeScreen
 import com.stillwater.app.ui.home.NotificationDisclosureScreen
 import com.stillwater.app.ui.onboarding.OnboardingScreen
+import com.stillwater.app.ui.plans.PlanBuilderScreen
+import com.stillwater.app.ui.plans.PlanScreen
 import com.stillwater.app.ui.sos.SosScreen
 import com.stillwater.app.ui.theme.Motion
 import kotlinx.serialization.Serializable
@@ -23,6 +25,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object HomeRoute
 @Serializable data class SosRoute(val entryPoint: String = "IN_APP")
 @Serializable data object NotificationDisclosureRoute
+@Serializable data object PlanRoute
+@Serializable data object PlanBuilderRoute
 
 @Composable
 fun StillwaterNavHost(
@@ -54,6 +58,7 @@ fun StillwaterNavHost(
                 onStartSos = { navController.navigate(SosRoute(entryPoint = "IN_APP")) },
                 onLogSlip = { navController.navigate(SosRoute(entryPoint = "RETRO_LOG")) },
                 onSetupQuickAccess = { navController.navigate(NotificationDisclosureRoute) },
+                onOpenPlan = { navController.navigate(PlanRoute) },
             )
         }
         composable<SosRoute> {
@@ -61,6 +66,15 @@ fun StillwaterNavHost(
         }
         composable<NotificationDisclosureRoute> {
             NotificationDisclosureScreen(onDone = { navController.popBackStack() })
+        }
+        composable<PlanRoute> {
+            PlanScreen(
+                onCreatePlan = { navController.navigate(PlanBuilderRoute) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable<PlanBuilderRoute> {
+            PlanBuilderScreen(onFinished = { navController.popBackStack() })
         }
     }
 }

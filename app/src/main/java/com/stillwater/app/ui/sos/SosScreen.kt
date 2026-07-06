@@ -121,6 +121,7 @@ fun SosScreen(
                     )
                     SosPhase.PLAN -> PlanPhase(
                         values = state.values,
+                        planSentence = state.plan?.sentence,
                         onContinue = viewModel::advanceToResolve,
                     )
                     SosPhase.RESOLVE -> ResolvePhase(
@@ -273,13 +274,21 @@ private fun WaveCanvas(elapsedSeconds: Int) {
 // ---- Phase 3: their own map, reflected back ----
 
 @Composable
-private fun PlanPhase(values: List<String>, onContinue: () -> Unit) {
+private fun PlanPhase(values: List<String>, planSentence: String?, onContinue: () -> Unit) {
     Text(
-        text = "Remember what this is for.",
+        text = if (planSentence != null) "You already decided this." else "Remember what this is for.",
         style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.onBackground,
     )
     Spacer(Modifier.height(Spacing.lg))
+    if (planSentence != null) {
+        CalmCard(tone = CalmTone.Celebrate) {
+            Text(text = "Your plan", style = MaterialTheme.typography.labelMedium)
+            Spacer(Modifier.height(Spacing.sm))
+            Text(text = planSentence, style = MaterialTheme.typography.titleMedium)
+        }
+        Spacer(Modifier.height(Spacing.md))
+    }
     CalmCard {
         Text(text = "You chose to protect:", style = MaterialTheme.typography.labelMedium)
         Spacer(Modifier.height(Spacing.sm))
@@ -295,12 +304,14 @@ private fun PlanPhase(values: List<String>, onContinue: () -> Unit) {
             )
         }
     }
-    Spacer(Modifier.height(Spacing.md))
-    Text(
-        text = "Your if-then plan will appear here once you build one.",
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
+    if (planSentence == null) {
+        Spacer(Modifier.height(Spacing.md))
+        Text(
+            text = "Your if-then plan will appear here once you build one.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
     Spacer(Modifier.height(Spacing.xxl))
     CalmPrimaryButton(text = "Continue", onClick = onContinue, isCrisis = true)
 }

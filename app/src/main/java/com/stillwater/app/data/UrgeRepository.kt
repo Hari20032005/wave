@@ -44,6 +44,7 @@ class UrgeRepository @Inject constructor(
         mood: MoodTag?,
         intensityAfter: Int? = null,
         triggerIds: List<Long> = emptyList(),
+        shownPlanId: Long? = null,
         note: String? = null,
     ) {
         urgeDao.completeEvent(
@@ -54,6 +55,7 @@ class UrgeRepository @Inject constructor(
             mode = eventMode?.takeIf { it != Mode.BOTH }?.name,
             mood = mood?.name,
             intensityAfter = intensityAfter,
+            shownPlanId = shownPlanId,
             note = note,
         )
         if (triggerIds.isNotEmpty()) {

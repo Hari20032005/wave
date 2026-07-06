@@ -4,11 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.stillwater.app.data.PlanRepository
 import com.stillwater.app.data.TriggerRepository
 import com.stillwater.app.data.UrgeRepository
 import com.stillwater.app.data.UserValuesRepository
 import com.stillwater.app.data.prefs.UserPreferencesRepository
 import com.stillwater.app.domain.model.EntryPoint
+import com.stillwater.app.domain.model.IfThenPlan
 import com.stillwater.app.domain.model.Mode
 import com.stillwater.app.domain.model.MoodTag
 import com.stillwater.app.domain.model.SosStep
@@ -46,6 +48,8 @@ data class SosUiState(
     val phase: SosPhase = SosPhase.BREATHE,
     val surfElapsedSeconds: Int = 0,
     val values: List<String> = emptyList(),
+    /** The user's active if-then plan, shown back at step 3. */
+    val plan: IfThenPlan? = null,
     /** Profile mode; BOTH means the log asks which pull it was. */
     val profileMode: Mode? = null,
     val triggers: List<Trigger> = emptyList(),
@@ -83,6 +87,7 @@ class SosViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val urgeRepository: UrgeRepository,
     private val triggerRepository: TriggerRepository,
+    private val planRepository: PlanRepository,
     valuesRepository: UserValuesRepository,
     preferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
@@ -108,7 +113,8 @@ class SosViewModel @Inject constructor(
         viewModelScope.launch {
             val prefs = preferencesRepository.userPreferences.first()
             val values = valuesRepository.values.first().map { it.name }
-            _uiState.update { it.copy(profileMode = prefs.mode, values = values) }
+            val plan = planRepository.currentPlan()
+            _uiState.update { it.copy(profileMode = prefs.mode, values = values, plan = plan) }
             eventId = urgeRepository.startEvent(entryPoint, prefs.mode)
         }
         viewModelScope.launch {
@@ -148,6 +154,9 @@ class SosViewModel @Inject constructor(
         timerJob?.cancel()
         furthestStep = SosStep.PLAN
         _uiState.update { it.copy(phase = SosPhase.PLAN) }
+        _uiState.value.plan?.let { plan ->
+            viewModelScope.launch { planRepository.recordShown(plan.id) }
+        }
     }
 
     fun advanceToResolve() = _uiState.update { it.copy(phase = SosPhase.RESOLVE) }
@@ -192,6 +201,7 @@ class SosViewModel @Inject constructor(
                 eventMode = state.chosenMode ?: state.profileMode,
                 mood = state.mood,
                 triggerIds = listOfNotNull(state.sparkTriggerId, state.placeTriggerId),
+                shownPlanId = state.plan?.takeIf { furthestStep >= SosStep.PLAN }?.id,
             )
             if (outcome == UrgeOutcome.LAPSED) {
                 urgeRepository.attachDebrief(

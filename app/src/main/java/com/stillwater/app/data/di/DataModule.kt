@@ -8,6 +8,8 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.stillwater.app.data.db.PlanDao
+import com.stillwater.app.data.db.RiskWindowDao
 import com.stillwater.app.data.db.SEED_TRIGGERS
 import com.stillwater.app.data.db.StillwaterDatabase
 import com.stillwater.app.data.db.TriggerDao
@@ -55,6 +57,12 @@ object DataModule {
 
     @Provides
     fun provideTriggerDao(db: StillwaterDatabase): TriggerDao = db.triggerDao()
+
+    @Provides
+    fun providePlanDao(db: StillwaterDatabase): PlanDao = db.planDao()
+
+    @Provides
+    fun provideRiskWindowDao(db: StillwaterDatabase): RiskWindowDao = db.riskWindowDao()
 
     @Provides
     @Singleton

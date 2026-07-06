@@ -17,3 +17,16 @@ data class Trigger(
     val category: TriggerCategory,
     val isCustom: Boolean = false,
 )
+
+/** An implementation intention: "If [situation], then I will [action]." */
+data class IfThenPlan(
+    val id: Long = 0,
+    val situationText: String,
+    val actionText: String,
+    val situationTriggerId: Long? = null,
+    val mode: Mode? = null,
+    val isActive: Boolean = true,
+    val rehearsalCount: Int = 0,
+) {
+    val sentence: String get() = "If $situationText, then I will $actionText."
+}

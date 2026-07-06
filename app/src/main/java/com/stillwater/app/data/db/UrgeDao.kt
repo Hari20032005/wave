@@ -19,6 +19,7 @@ interface UrgeDao {
             mode = :mode,
             mood = :mood,
             intensityAfter = :intensityAfter,
+            shownPlanId = :shownPlanId,
             note = :note
         WHERE id = :id
         """,
@@ -31,6 +32,7 @@ interface UrgeDao {
         mode: String?,
         mood: String?,
         intensityAfter: Int?,
+        shownPlanId: Long?,
         note: String?,
     )
 
