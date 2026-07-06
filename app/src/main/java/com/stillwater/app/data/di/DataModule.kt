@@ -8,6 +8,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.stillwater.app.data.db.MonitoredAppDao
 import com.stillwater.app.data.db.PlanDao
 import com.stillwater.app.data.db.RiskWindowDao
 import com.stillwater.app.data.db.SEED_TRIGGERS
@@ -63,6 +64,9 @@ object DataModule {
 
     @Provides
     fun provideRiskWindowDao(db: StillwaterDatabase): RiskWindowDao = db.riskWindowDao()
+
+    @Provides
+    fun provideMonitoredAppDao(db: StillwaterDatabase): MonitoredAppDao = db.monitoredAppDao()
 
     @Provides
     @Singleton

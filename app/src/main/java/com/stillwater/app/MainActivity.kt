@@ -27,12 +27,13 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val ACTION_OPEN_SOS = "com.stillwater.app.OPEN_SOS"
         const val EXTRA_ENTRY_POINT = "entry_point"
+        const val EXTRA_INTERCEPTED_PACKAGE = "intercepted_package"
     }
 
     private val viewModel: MainViewModel by viewModels()
 
-    /** Set by widget/notification taps; consumed once the nav graph is up. */
-    private val pendingSosEntryPoint = MutableStateFlow<String?>(null)
+    /** Set by widget/notification/intercept taps; consumed once the nav graph is up. */
+    private val pendingSosEntryPoint = MutableStateFlow<Pair<String, String?>?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -58,10 +59,12 @@ class MainActivity : ComponentActivity() {
                             )
                             val pendingSos by pendingSosEntryPoint.collectAsStateWithLifecycle()
                             LaunchedEffect(pendingSos) {
-                                val entryPoint = pendingSos ?: return@LaunchedEffect
+                                val (entryPoint, pkg) = pendingSos ?: return@LaunchedEffect
                                 // SOS entry points only make sense once set up.
                                 if (state.onboardingComplete) {
-                                    navController.navigate(SosRoute(entryPoint = entryPoint))
+                                    navController.navigate(
+                                        SosRoute(entryPoint = entryPoint, interceptedPackage = pkg),
+                                    )
                                 }
                                 pendingSosEntryPoint.value = null
                             }
@@ -79,7 +82,9 @@ class MainActivity : ComponentActivity() {
 
     private fun consumeSosIntent(intent: Intent?) {
         if (intent?.action == ACTION_OPEN_SOS) {
-            pendingSosEntryPoint.value = intent.getStringExtra(EXTRA_ENTRY_POINT) ?: "WIDGET"
+            pendingSosEntryPoint.value =
+                (intent.getStringExtra(EXTRA_ENTRY_POINT) ?: "WIDGET") to
+                intent.getStringExtra(EXTRA_INTERCEPTED_PACKAGE)
         }
     }
 }

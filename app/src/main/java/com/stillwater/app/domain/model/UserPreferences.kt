@@ -32,6 +32,8 @@ data class UserPreferences(
     val framing: Framing = Framing.HABIT_CHANGE,
     /** Whether the quiet quick-access notification is enabled. */
     val quickAccessEnabled: Boolean = false,
+    /** Whether the interception (protection) layer is on. */
+    val interceptionEnabled: Boolean = false,
 )
 
 /** A value the user chose to protect. Stored in Room (`user_value`). */

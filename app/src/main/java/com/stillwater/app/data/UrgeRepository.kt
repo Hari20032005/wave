@@ -22,7 +22,11 @@ class UrgeRepository @Inject constructor(
 ) {
 
     /** Insert at flow start; outcome stays null until resolution. */
-    suspend fun startEvent(entryPoint: EntryPoint, mode: Mode?): Long {
+    suspend fun startEvent(
+        entryPoint: EntryPoint,
+        mode: Mode?,
+        interceptedPackage: String? = null,
+    ): Long {
         val now = ZonedDateTime.now()
         return urgeDao.insertEvent(
             UrgeEventEntity(
@@ -32,7 +36,32 @@ class UrgeRepository @Inject constructor(
                 // BOTH isn't an event-level mode; those users choose in the log.
                 mode = mode?.takeIf { it != Mode.BOTH }?.name,
                 entryPoint = entryPoint.name,
+                interceptedPackage = interceptedPackage,
             ),
+        )
+    }
+
+    /**
+     * One-shot log for intercept decisions taken on the overlay itself
+     * ("continue anyway" / "I'll skip it") — both outcomes are equally
+     * valuable to the trigger model.
+     */
+    suspend fun logInterceptOutcome(
+        interceptedPackage: String,
+        mode: Mode?,
+        outcome: UrgeOutcome,
+    ) {
+        val id = startEvent(EntryPoint.INTERCEPT, mode, interceptedPackage)
+        urgeDao.completeEvent(
+            id = id,
+            endedAtEpochMs = System.currentTimeMillis(),
+            outcome = outcome.name,
+            furthestStep = null,
+            mode = mode?.takeIf { it != Mode.BOTH }?.name,
+            mood = null,
+            intensityAfter = null,
+            shownPlanId = null,
+            note = null,
         )
     }
 

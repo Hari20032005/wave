@@ -19,6 +19,8 @@ class RiskWindowRepository @Inject constructor(
 ) {
     suspend fun enabledWindows(): List<RiskWindowEntity> = dao.getEnabled()
 
+    val allWindows: kotlinx.coroutines.flow.Flow<List<RiskWindowEntity>> = dao.getAll()
+
     /**
      * Derive default windows from the onboarding trigger-time answers, once.
      * (WHEN_ALONE / UNPREDICTABLE have no clock shape — nothing to derive.)

@@ -13,6 +13,8 @@ import com.stillwater.app.ui.home.NotificationDisclosureScreen
 import com.stillwater.app.ui.onboarding.OnboardingScreen
 import com.stillwater.app.ui.plans.PlanBuilderScreen
 import com.stillwater.app.ui.plans.PlanScreen
+import com.stillwater.app.ui.protection.AppPickerScreen
+import com.stillwater.app.ui.protection.ProtectionScreen
 import com.stillwater.app.ui.sos.SosScreen
 import com.stillwater.app.ui.theme.Motion
 import kotlinx.serialization.Serializable
@@ -23,10 +25,15 @@ import kotlinx.serialization.Serializable
  */
 @Serializable data object OnboardingRoute
 @Serializable data object HomeRoute
-@Serializable data class SosRoute(val entryPoint: String = "IN_APP")
+@Serializable data class SosRoute(
+    val entryPoint: String = "IN_APP",
+    val interceptedPackage: String? = null,
+)
 @Serializable data object NotificationDisclosureRoute
 @Serializable data object PlanRoute
 @Serializable data object PlanBuilderRoute
+@Serializable data object ProtectionRoute
+@Serializable data object AppPickerRoute
 
 @Composable
 fun StillwaterNavHost(
@@ -59,6 +66,7 @@ fun StillwaterNavHost(
                 onLogSlip = { navController.navigate(SosRoute(entryPoint = "RETRO_LOG")) },
                 onSetupQuickAccess = { navController.navigate(NotificationDisclosureRoute) },
                 onOpenPlan = { navController.navigate(PlanRoute) },
+                onOpenProtection = { navController.navigate(ProtectionRoute) },
             )
         }
         composable<SosRoute> {
@@ -75,6 +83,15 @@ fun StillwaterNavHost(
         }
         composable<PlanBuilderRoute> {
             PlanBuilderScreen(onFinished = { navController.popBackStack() })
+        }
+        composable<ProtectionRoute> {
+            ProtectionScreen(
+                onPickApps = { navController.navigate(AppPickerRoute) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable<AppPickerRoute> {
+            AppPickerScreen(onBack = { navController.popBackStack() })
         }
     }
 }

@@ -20,12 +20,14 @@ import androidx.room.RoomDatabase
         EventTriggerEntity::class,
         IfThenPlanEntity::class,
         RiskWindowEntity::class,
+        MonitoredAppEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4),
     ],
 )
 abstract class StillwaterDatabase : RoomDatabase() {
@@ -34,4 +36,5 @@ abstract class StillwaterDatabase : RoomDatabase() {
     abstract fun triggerDao(): TriggerDao
     abstract fun planDao(): PlanDao
     abstract fun riskWindowDao(): RiskWindowDao
+    abstract fun monitoredAppDao(): MonitoredAppDao
 }

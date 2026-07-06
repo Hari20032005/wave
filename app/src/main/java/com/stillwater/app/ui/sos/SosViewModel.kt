@@ -92,8 +92,9 @@ class SosViewModel @Inject constructor(
     preferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
+    private val route = savedStateHandle.toRoute<SosRoute>()
     private val entryPoint: EntryPoint =
-        runCatching { EntryPoint.valueOf(savedStateHandle.toRoute<SosRoute>().entryPoint) }
+        runCatching { EntryPoint.valueOf(route.entryPoint) }
             .getOrDefault(EntryPoint.IN_APP)
 
     private val _uiState = MutableStateFlow(
@@ -115,7 +116,7 @@ class SosViewModel @Inject constructor(
             val values = valuesRepository.values.first().map { it.name }
             val plan = planRepository.currentPlan()
             _uiState.update { it.copy(profileMode = prefs.mode, values = values, plan = plan) }
-            eventId = urgeRepository.startEvent(entryPoint, prefs.mode)
+            eventId = urgeRepository.startEvent(entryPoint, prefs.mode, route.interceptedPackage)
         }
         viewModelScope.launch {
             triggerRepository.activeTriggers.collect { triggers ->

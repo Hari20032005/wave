@@ -29,6 +29,7 @@ class UserPreferencesRepository @Inject constructor(
         val MORAL_INCONGRUENCE = floatPreferencesKey("moral_incongruence")
         val FRAMING = stringPreferencesKey("framing")
         val QUICK_ACCESS_ENABLED = booleanPreferencesKey("quick_access_enabled")
+        val INTERCEPTION_ENABLED = booleanPreferencesKey("interception_enabled")
     }
 
     val userPreferences: Flow<UserPreferences> = dataStore.data.map { prefs ->
@@ -42,11 +43,16 @@ class UserPreferencesRepository @Inject constructor(
                 ?.let { runCatching { Framing.valueOf(it) }.getOrNull() }
                 ?: Framing.HABIT_CHANGE,
             quickAccessEnabled = prefs[Keys.QUICK_ACCESS_ENABLED] ?: false,
+            interceptionEnabled = prefs[Keys.INTERCEPTION_ENABLED] ?: false,
         )
     }
 
     suspend fun setQuickAccessEnabled(enabled: Boolean) {
         dataStore.edit { prefs -> prefs[Keys.QUICK_ACCESS_ENABLED] = enabled }
+    }
+
+    suspend fun setInterceptionEnabled(enabled: Boolean) {
+        dataStore.edit { prefs -> prefs[Keys.INTERCEPTION_ENABLED] = enabled }
     }
 
     /** Single atomic write at the end of onboarding. */
