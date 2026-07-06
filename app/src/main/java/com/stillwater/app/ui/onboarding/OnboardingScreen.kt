@@ -46,6 +46,7 @@ import com.stillwater.app.ui.components.CalmCard
 import com.stillwater.app.ui.components.CalmPrimaryButton
 import com.stillwater.app.ui.components.CalmQuietButton
 import com.stillwater.app.ui.components.CalmTone
+import com.stillwater.app.ui.paywall.PaywallContent
 import com.stillwater.app.ui.theme.Motion
 import com.stillwater.app.ui.theme.Spacing
 
@@ -365,13 +366,7 @@ private fun AffirmationStep(values: List<String>, framing: Framing) {
 
 @Composable
 private fun PaywallPlaceholderStep() {
-    StepHeader(title = "Everything is free right now")
-    CalmCard {
-        Text(
-            text = "Stillwater is being built in the open. Later, a few advanced tools — " +
-                "app interception, insights — will become part of a paid tier. " +
-                "The SOS flow, logging, and your plan will always be free.",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-    }
+    // Real paywall (M5); the scaffold's "Start using Stillwater" button below
+    // is the continue-free path, so no extra escape needed here.
+    PaywallContent(continueText = null, onContinueFree = {})
 }

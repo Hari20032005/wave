@@ -38,6 +38,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -80,6 +81,7 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.billing.ktx)
     implementation(libs.androidx.compose.material.icons.extended)
 
     testImplementation(libs.junit)

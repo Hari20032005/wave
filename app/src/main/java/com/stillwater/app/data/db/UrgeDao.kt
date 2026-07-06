@@ -4,6 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 
+/** Lightweight projection for progress computations. */
+data class ResolvedEvent(
+    val startedAtEpochMs: Long,
+    val outcome: String,
+    val entryPoint: String,
+)
+
 @Dao
 interface UrgeDao {
 
@@ -41,6 +48,14 @@ interface UrgeDao {
 
     @Insert
     suspend fun insertDebrief(debrief: LapseDebriefEntity)
+
+    @Query(
+        """
+        SELECT startedAtEpochMs, outcome, entryPoint FROM urge_event
+        WHERE outcome IS NOT NULL ORDER BY startedAtEpochMs
+        """,
+    )
+    fun getResolvedEvents(): kotlinx.coroutines.flow.Flow<List<ResolvedEvent>>
 
     /** Flows that never resolved (process death, swiped away) become honest data. */
     @Query(

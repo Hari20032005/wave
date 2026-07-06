@@ -39,6 +39,7 @@ import com.stillwater.app.ui.theme.Spacing
 @Composable
 fun ProtectionScreen(
     onPickApps: () -> Unit,
+    onOpenPaywall: () -> Unit,
     onBack: () -> Unit,
     viewModel: ProtectionViewModel = hiltViewModel(),
 ) {
@@ -76,6 +77,30 @@ fun ProtectionScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(Spacing.lg))
+
+        if (!state.isPremium) {
+            // Premium gate — everything below stays visible so the user can
+            // see exactly what they'd be getting, but setup starts here.
+            CalmCard {
+                Text("Part of Premium", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(Spacing.xs))
+                Text(
+                    text = "App protection is a Premium tool. The SOS flow, logging, " +
+                        "and your plan stay free forever.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(Spacing.sm))
+                CalmQuietButton(text = "See Premium", onClick = onOpenPaywall)
+            }
+            Spacer(Modifier.height(Spacing.lg))
+            CalmQuietButton(
+                text = "Back",
+                onClick = onBack,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+            return@Column
+        }
 
         // Master toggle
         CalmCard {

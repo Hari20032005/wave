@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ProtectionUiState(
+    val isPremium: Boolean = false,
     val interceptionEnabled: Boolean = false,
     val hasUsageAccess: Boolean = false,
     val hasOverlay: Boolean = false,
@@ -39,6 +40,7 @@ class ProtectionViewModel @Inject constructor(
     private val preferencesRepository: UserPreferencesRepository,
     private val monitoredAppRepository: MonitoredAppRepository,
     private val riskWindowRepository: RiskWindowRepository,
+    billingRepository: com.stillwater.app.data.billing.BillingRepository,
 ) : AndroidViewModel(application) {
 
     private val permissionState = MutableStateFlow(readPermissions())
@@ -48,8 +50,10 @@ class ProtectionViewModel @Inject constructor(
         monitoredAppRepository.monitoredApps,
         riskWindowRepository.allWindows,
         permissionState,
-    ) { prefs, apps, windows, perms ->
+        billingRepository.isPremium,
+    ) { prefs, apps, windows, perms, premium ->
         ProtectionUiState(
+            isPremium = premium,
             interceptionEnabled = prefs.interceptionEnabled,
             hasUsageAccess = perms.first,
             hasOverlay = perms.second,

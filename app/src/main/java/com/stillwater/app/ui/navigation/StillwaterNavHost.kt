@@ -11,8 +11,10 @@ import androidx.navigation.compose.composable
 import com.stillwater.app.ui.home.HomeScreen
 import com.stillwater.app.ui.home.NotificationDisclosureScreen
 import com.stillwater.app.ui.onboarding.OnboardingScreen
+import com.stillwater.app.ui.paywall.PaywallScreen
 import com.stillwater.app.ui.plans.PlanBuilderScreen
 import com.stillwater.app.ui.plans.PlanScreen
+import com.stillwater.app.ui.progress.ProgressScreen
 import com.stillwater.app.ui.protection.AppPickerScreen
 import com.stillwater.app.ui.protection.ProtectionScreen
 import com.stillwater.app.ui.sos.SosScreen
@@ -34,6 +36,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object PlanBuilderRoute
 @Serializable data object ProtectionRoute
 @Serializable data object AppPickerRoute
+@Serializable data object ProgressRoute
+@Serializable data object PaywallRoute
 
 @Composable
 fun StillwaterNavHost(
@@ -67,6 +71,7 @@ fun StillwaterNavHost(
                 onSetupQuickAccess = { navController.navigate(NotificationDisclosureRoute) },
                 onOpenPlan = { navController.navigate(PlanRoute) },
                 onOpenProtection = { navController.navigate(ProtectionRoute) },
+                onOpenProgress = { navController.navigate(ProgressRoute) },
             )
         }
         composable<SosRoute> {
@@ -87,11 +92,18 @@ fun StillwaterNavHost(
         composable<ProtectionRoute> {
             ProtectionScreen(
                 onPickApps = { navController.navigate(AppPickerRoute) },
+                onOpenPaywall = { navController.navigate(PaywallRoute) },
                 onBack = { navController.popBackStack() },
             )
         }
         composable<AppPickerRoute> {
             AppPickerScreen(onBack = { navController.popBackStack() })
+        }
+        composable<ProgressRoute> {
+            ProgressScreen(onBack = { navController.popBackStack() })
+        }
+        composable<PaywallRoute> {
+            PaywallScreen(onClose = { navController.popBackStack() })
         }
     }
 }
