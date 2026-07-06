@@ -119,9 +119,22 @@ fun ProtectionScreen(
                     )
                 }
                 Spacer(Modifier.width(Spacing.md))
+                val activity = androidx.activity.compose.LocalActivity.current
+                        as? androidx.fragment.app.FragmentActivity
                 Switch(
                     checked = state.interceptionEnabled,
-                    onCheckedChange = { viewModel.setEnabled(it) },
+                    onCheckedChange = { wanted ->
+                        // Turning protection OFF goes through the M6 lock —
+                        // a hard moment shouldn't undo a calm decision.
+                        if (!wanted && state.protectionLockEnabled && activity != null) {
+                            com.stillwater.app.ui.settings.AppLock.requireUnlock(
+                                activity,
+                                "Turn off protection",
+                            ) { ok -> if (ok) viewModel.setEnabled(false) }
+                        } else {
+                            viewModel.setEnabled(wanted)
+                        }
+                    },
                     enabled = state.canEnable || state.interceptionEnabled,
                     colors = SwitchDefaults.colors(
                         checkedTrackColor = MaterialTheme.colorScheme.primary,

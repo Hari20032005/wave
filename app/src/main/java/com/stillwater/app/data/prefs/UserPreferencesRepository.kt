@@ -30,6 +30,7 @@ class UserPreferencesRepository @Inject constructor(
         val FRAMING = stringPreferencesKey("framing")
         val QUICK_ACCESS_ENABLED = booleanPreferencesKey("quick_access_enabled")
         val INTERCEPTION_ENABLED = booleanPreferencesKey("interception_enabled")
+        val PROTECTION_LOCK_ENABLED = booleanPreferencesKey("protection_lock_enabled")
     }
 
     val userPreferences: Flow<UserPreferences> = dataStore.data.map { prefs ->
@@ -44,7 +45,12 @@ class UserPreferencesRepository @Inject constructor(
                 ?: Framing.HABIT_CHANGE,
             quickAccessEnabled = prefs[Keys.QUICK_ACCESS_ENABLED] ?: false,
             interceptionEnabled = prefs[Keys.INTERCEPTION_ENABLED] ?: false,
+            protectionLockEnabled = prefs[Keys.PROTECTION_LOCK_ENABLED] ?: false,
         )
+    }
+
+    suspend fun setProtectionLockEnabled(enabled: Boolean) {
+        dataStore.edit { prefs -> prefs[Keys.PROTECTION_LOCK_ENABLED] = enabled }
     }
 
     suspend fun setQuickAccessEnabled(enabled: Boolean) {

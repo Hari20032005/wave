@@ -23,6 +23,7 @@ import javax.inject.Inject
 
 data class ProtectionUiState(
     val isPremium: Boolean = false,
+    val protectionLockEnabled: Boolean = false,
     val interceptionEnabled: Boolean = false,
     val hasUsageAccess: Boolean = false,
     val hasOverlay: Boolean = false,
@@ -54,6 +55,7 @@ class ProtectionViewModel @Inject constructor(
     ) { prefs, apps, windows, perms, premium ->
         ProtectionUiState(
             isPremium = premium,
+            protectionLockEnabled = prefs.protectionLockEnabled,
             interceptionEnabled = prefs.interceptionEnabled,
             hasUsageAccess = perms.first,
             hasOverlay = perms.second,

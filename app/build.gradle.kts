@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.billing.ktx)
+    implementation(libs.androidx.biometric)
     implementation(libs.androidx.compose.material.icons.extended)
 
     testImplementation(libs.junit)

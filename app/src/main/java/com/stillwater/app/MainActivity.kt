@@ -2,7 +2,6 @@ package com.stillwater.app
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -21,8 +20,10 @@ import com.stillwater.app.ui.theme.StillwaterTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 
+// FragmentActivity (a ComponentActivity) so androidx.biometric can attach
+// its prompt for the M6 protection lock.
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : androidx.fragment.app.FragmentActivity() {
 
     companion object {
         const val ACTION_OPEN_SOS = "com.stillwater.app.OPEN_SOS"

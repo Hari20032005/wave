@@ -17,6 +17,8 @@ import com.stillwater.app.ui.plans.PlanScreen
 import com.stillwater.app.ui.progress.ProgressScreen
 import com.stillwater.app.ui.protection.AppPickerScreen
 import com.stillwater.app.ui.protection.ProtectionScreen
+import com.stillwater.app.ui.settings.PrivacyPolicyScreen
+import com.stillwater.app.ui.settings.SettingsScreen
 import com.stillwater.app.ui.sos.SosScreen
 import com.stillwater.app.ui.theme.Motion
 import kotlinx.serialization.Serializable
@@ -38,6 +40,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object AppPickerRoute
 @Serializable data object ProgressRoute
 @Serializable data object PaywallRoute
+@Serializable data object SettingsRoute
+@Serializable data object PrivacyPolicyRoute
 
 @Composable
 fun StillwaterNavHost(
@@ -72,6 +76,7 @@ fun StillwaterNavHost(
                 onOpenPlan = { navController.navigate(PlanRoute) },
                 onOpenProtection = { navController.navigate(ProtectionRoute) },
                 onOpenProgress = { navController.navigate(ProgressRoute) },
+                onOpenSettings = { navController.navigate(SettingsRoute) },
             )
         }
         composable<SosRoute> {
@@ -104,6 +109,15 @@ fun StillwaterNavHost(
         }
         composable<PaywallRoute> {
             PaywallScreen(onClose = { navController.popBackStack() })
+        }
+        composable<SettingsRoute> {
+            SettingsScreen(
+                onOpenPrivacyPolicy = { navController.navigate(PrivacyPolicyRoute) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable<PrivacyPolicyRoute> {
+            PrivacyPolicyScreen(onBack = { navController.popBackStack() })
         }
     }
 }

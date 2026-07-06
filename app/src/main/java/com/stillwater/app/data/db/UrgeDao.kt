@@ -57,6 +57,16 @@ interface UrgeDao {
     )
     fun getResolvedEvents(): kotlinx.coroutines.flow.Flow<List<ResolvedEvent>>
 
+    // ---- Full dumps for the user's data export (M6) ----
+    @Query("SELECT * FROM urge_event ORDER BY id")
+    suspend fun dumpEvents(): List<UrgeEventEntity>
+
+    @Query("SELECT * FROM lapse_debrief ORDER BY id")
+    suspend fun dumpDebriefs(): List<LapseDebriefEntity>
+
+    @Query("SELECT * FROM event_trigger")
+    suspend fun dumpEventTriggers(): List<EventTriggerEntity>
+
     /** Flows that never resolved (process death, swiped away) become honest data. */
     @Query(
         """

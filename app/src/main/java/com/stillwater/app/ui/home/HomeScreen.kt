@@ -34,6 +34,7 @@ fun HomeScreen(
     onOpenPlan: () -> Unit = {},
     onOpenProtection: () -> Unit = {},
     onOpenProgress: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -82,6 +83,11 @@ fun HomeScreen(
         CalmQuietButton(
             text = "Progress",
             onClick = onOpenProgress,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+        CalmQuietButton(
+            text = "Settings",
+            onClick = onOpenSettings,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
 

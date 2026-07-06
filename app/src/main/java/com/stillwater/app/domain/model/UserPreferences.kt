@@ -34,6 +34,8 @@ data class UserPreferences(
     val quickAccessEnabled: Boolean = false,
     /** Whether the interception (protection) layer is on. */
     val interceptionEnabled: Boolean = false,
+    /** Require device unlock before protection can be changed (M6). */
+    val protectionLockEnabled: Boolean = false,
 )
 
 /** A value the user chose to protect. Stored in Room (`user_value`). */
