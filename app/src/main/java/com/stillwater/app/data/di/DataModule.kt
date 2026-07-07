@@ -2,9 +2,8 @@ package com.stillwater.app.data.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -72,7 +71,13 @@ object DataModule {
     @Singleton
     fun providePreferencesDataStore(
         @ApplicationContext context: Context,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        produceFile = { context.preferencesDataStoreFile("user_prefs") },
-    )
+    ): DataStore<Preferences> = context.userPrefsDataStore
 }
+
+/**
+ * Process-wide singleton via the delegate — survives Hilt component
+ * recreation (each @HiltAndroidTest method builds a fresh component, and two
+ * DataStores on one file deadlock).
+ */
+private val Context.userPrefsDataStore: DataStore<Preferences>
+    by preferencesDataStore(name = "user_prefs")
