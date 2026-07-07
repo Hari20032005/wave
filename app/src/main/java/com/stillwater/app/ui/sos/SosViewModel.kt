@@ -62,9 +62,9 @@ data class SosUiState(
     val whatPreceded: String = "",
     val nextTimeIdea: String = "",
     val isSaving: Boolean = false,
+    /** True from the debrief onward (incl. LOG) — drives the lapse-path copy. */
+    val isLapsePath: Boolean = false,
 ) {
-    val isLapsePath: Boolean
-        get() = phase == SosPhase.DEBRIEF || phase == SosPhase.LAPSE_CLOSE
 
     val sparkTriggers: List<Trigger>
         get() = triggers.filter { it.category != TriggerCategory.PLACE }
@@ -98,7 +98,10 @@ class SosViewModel @Inject constructor(
             .getOrDefault(EntryPoint.IN_APP)
 
     private val _uiState = MutableStateFlow(
-        SosUiState(phase = if (entryPoint == EntryPoint.RETRO_LOG) SosPhase.DEBRIEF else SosPhase.BREATHE),
+        SosUiState(
+            phase = if (entryPoint == EntryPoint.RETRO_LOG) SosPhase.DEBRIEF else SosPhase.BREATHE,
+            isLapsePath = entryPoint == EntryPoint.RETRO_LOG,
+        ),
     )
     val uiState: StateFlow<SosUiState> = _uiState.asStateFlow()
 
@@ -171,7 +174,7 @@ class SosViewModel @Inject constructor(
     /** "I acted on it" → the shame-free debrief, then the same log. */
     fun startLapsePath() {
         cameThroughDebrief = true
-        _uiState.update { it.copy(phase = SosPhase.DEBRIEF) }
+        _uiState.update { it.copy(phase = SosPhase.DEBRIEF, isLapsePath = true) }
     }
 
     fun continueDebriefToLog() {

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +45,10 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .padding(horizontal = Spacing.screenEdge),
+            // Scrollable: on shorter screens the quick-access card would
+            // otherwise clip past the bottom edge unreachably.
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = Spacing.screenEdge, vertical = Spacing.lg),
         verticalArrangement = Arrangement.Center,
     ) {
         Text(

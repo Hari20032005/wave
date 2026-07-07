@@ -107,10 +107,23 @@ class ProtectionViewModel @Inject constructor(
     )
 
     /**
-     * OEM battery-killer settings, best effort. Every intent is optional —
-     * the caller falls back to plain-text instructions when none resolve.
+     * OEM battery-killer settings, best effort. Component paths differ per
+     * OEM skin version (verified: realme UI lacks both classic ColorOS
+     * activities), so the app-details screen — which always resolves and
+     * carries the Auto-startup toggle on these skins — is appended as the
+     * guaranteed fallback.
      */
     fun oemIntents(): List<Intent> {
+        val specific = oemSpecificIntents()
+        if (specific.isEmpty()) return emptyList() // unknown brand → no card
+        val appDetails = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:${getApplication<Application>().packageName}"),
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return specific + appDetails
+    }
+
+    private fun oemSpecificIntents(): List<Intent> {
         val byComponent = { pkg: String, cls: String ->
             Intent().setClassName(pkg, cls).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
