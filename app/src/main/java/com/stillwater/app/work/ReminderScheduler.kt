@@ -38,9 +38,20 @@ class ReminderScheduler @Inject constructor(
             }.minOrNull()
     }
 
-    fun scheduleNext(windows: List<RiskWindowEntity>) {
+    /**
+     * [personalPeakHour] comes from the tide engine: when known, the reminder
+     * fires ~20 minutes before the user's own learned peak if that beats the
+     * static windows — the schedule adapts to the person.
+     */
+    fun scheduleNext(windows: List<RiskWindowEntity>, personalPeakHour: Int? = null) {
         val now = ZonedDateTime.now()
-        val next = nextWindowStart(now, windows) ?: return
+        val windowNext = nextWindowStart(now, windows)
+        val tideNext = personalPeakHour?.let { peak ->
+            var pre = com.stillwater.app.domain.RiskEngine.nextHighTide(now, peak).minusMinutes(20)
+            if (!pre.isAfter(now)) pre = pre.plusDays(1)
+            pre
+        }
+        val next = listOfNotNull(windowNext, tideNext).minOrNull() ?: return
         val request = OneTimeWorkRequestBuilder<PlanReminderWorker>()
             .setInitialDelay(Duration.between(now, next))
             .build()

@@ -57,6 +57,44 @@ interface UrgeDao {
     )
     fun getResolvedEvents(): kotlinx.coroutines.flow.Flow<List<ResolvedEvent>>
 
+    // ---- Pattern engine feeds (Tide) ----
+    @Query(
+        """
+        SELECT startedAtEpochMs, endedAtEpochMs, localHourOfDay, localDayOfWeek,
+               mood, outcome, entryPoint, interceptedPackage
+        FROM urge_event WHERE outcome IS NOT NULL ORDER BY startedAtEpochMs
+        """,
+    )
+    fun getRiskEvents(): kotlinx.coroutines.flow.Flow<List<com.stillwater.app.domain.RiskEvent>>
+
+    /** Most frequently logged trigger, for the "your pattern" card. */
+    @Query(
+        """
+        SELECT t.name FROM event_trigger et
+        JOIN trigger t ON t.id = et.triggerId
+        GROUP BY et.triggerId ORDER BY COUNT(*) DESC LIMIT 1
+        """,
+    )
+    suspend fun topTriggerName(): String?
+
+    /** Door stats for one app over a recent period: total visits + walked away. */
+    @Query(
+        """
+        SELECT COUNT(*) FROM urge_event
+        WHERE interceptedPackage = :packageName AND startedAtEpochMs >= :sinceEpochMs
+        """,
+    )
+    suspend fun doorVisitsSince(packageName: String, sinceEpochMs: Long): Int
+
+    @Query(
+        """
+        SELECT COUNT(*) FROM urge_event
+        WHERE interceptedPackage = :packageName AND startedAtEpochMs >= :sinceEpochMs
+          AND outcome IN ('SKIPPED_APP', 'SURFED')
+        """,
+    )
+    suspend fun doorWalkawaysSince(packageName: String, sinceEpochMs: Long): Int
+
     // ---- Full dumps for the user's data export (M6) ----
     @Query("SELECT * FROM urge_event ORDER BY id")
     suspend fun dumpEvents(): List<UrgeEventEntity>

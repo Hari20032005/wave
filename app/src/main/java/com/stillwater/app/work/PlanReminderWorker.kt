@@ -10,6 +10,7 @@ import com.stillwater.app.notification.QuickAccessNotification
 import com.stillwater.app.notification.ReminderNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 
 @HiltWorker
 class PlanReminderWorker @AssistedInject constructor(
@@ -17,6 +18,7 @@ class PlanReminderWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val planRepository: PlanRepository,
     private val riskWindowRepository: RiskWindowRepository,
+    private val riskRepository: com.stillwater.app.data.RiskRepository,
     private val reminderNotification: ReminderNotification,
     private val quickAccessNotification: QuickAccessNotification,
     private val reminderScheduler: ReminderScheduler,
@@ -28,8 +30,9 @@ class PlanReminderWorker @AssistedInject constructor(
         if (plan != null && quickAccessNotification.hasPermission()) {
             reminderNotification.show(plan.sentence)
         }
-        // Keep the chain alive either way.
-        reminderScheduler.scheduleNext(riskWindowRepository.enabledWindows())
+        // Keep the chain alive either way — adapted to the learned peak.
+        val peakHour = riskRepository.snapshot.first().peakHour
+        reminderScheduler.scheduleNext(riskWindowRepository.enabledWindows(), peakHour)
         return Result.success()
     }
 }

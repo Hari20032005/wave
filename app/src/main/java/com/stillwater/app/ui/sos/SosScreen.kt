@@ -116,6 +116,7 @@ fun SosScreen(
                     SosPhase.SURF -> SurfPhase(
                         elapsedSeconds = state.surfElapsedSeconds,
                         line = state.surfLine,
+                        personalEvidence = state.personalEvidence,
                         haptics = sosHaptics,
                         onSkip = viewModel::advanceToPlan,
                     )
@@ -211,6 +212,7 @@ private fun BreathePhase(haptics: SosHaptics, onSkip: () -> Unit) {
 private fun SurfPhase(
     elapsedSeconds: Int,
     line: String,
+    personalEvidence: String?,
     haptics: SosHaptics,
     onSkip: () -> Unit,
 ) {
@@ -225,6 +227,15 @@ private fun SurfPhase(
             style = MaterialTheme.typography.displayLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
+        if (personalEvidence != null) {
+            Spacer(Modifier.height(Spacing.md))
+            // Their own track record — the one line a craving brain believes.
+            Text(
+                text = personalEvidence,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Spacer(Modifier.height(Spacing.xxl))
         WaveCanvas(elapsedSeconds = elapsedSeconds)
         Spacer(Modifier.height(Spacing.xxl))

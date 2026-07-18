@@ -69,6 +69,7 @@ class MonitorService : Service() {
     @Inject lateinit var riskWindowRepository: RiskWindowRepository
     @Inject lateinit var urgeRepository: UrgeRepository
     @Inject lateinit var preferencesRepository: UserPreferencesRepository
+    @Inject lateinit var riskRepository: com.stillwater.app.data.RiskRepository
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var pollJob: Job? = null
@@ -143,8 +144,9 @@ class MonitorService : Service() {
                 packageManager.getApplicationInfo(foreground, 0),
             ).toString()
         }.getOrDefault("that app")
+        val memoryLine = runCatching { riskRepository.doorMemory(foreground) }.getOrNull()
 
-        withContext(Dispatchers.Main) { showIntercept(foreground, label) }
+        withContext(Dispatchers.Main) { showIntercept(foreground, label, memoryLine) }
     }
 
     private fun latestForegroundPackage(): String? {
@@ -162,9 +164,10 @@ class MonitorService : Service() {
         return latest
     }
 
-    private fun showIntercept(pkg: String, label: String) {
+    private fun showIntercept(pkg: String, label: String, memoryLine: String?) {
         overlay.show(
             appLabel = label,
+            memoryLine = memoryLine,
             onSurf = {
                 overlay.dismiss()
                 startActivity(

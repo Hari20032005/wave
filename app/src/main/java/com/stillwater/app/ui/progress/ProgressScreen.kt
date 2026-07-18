@@ -106,6 +106,27 @@ fun ProgressScreen(
             }
             Spacer(Modifier.height(Spacing.md))
 
+            if (state.patternLines.isNotEmpty()) {
+                CalmCard {
+                    Text(text = "Your pattern", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(Spacing.xs))
+                    Text(
+                        text = "Learned from your own logs, on this phone only.",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(Spacing.sm))
+                    state.patternLines.forEach { line ->
+                        Text(
+                            text = line,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(vertical = Spacing.xs),
+                        )
+                    }
+                }
+                Spacer(Modifier.height(Spacing.md))
+            }
+
             CalmCard(tone = CalmTone.Lapse) {
                 Text(text = "Coming back", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(Spacing.xs))

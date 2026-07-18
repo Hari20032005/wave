@@ -2,15 +2,18 @@ package com.stillwater.app.ui.progress
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.stillwater.app.data.RiskRepository
 import com.stillwater.app.data.db.ResolvedEvent
 import com.stillwater.app.data.db.UrgeDao
+import com.stillwater.app.domain.RiskEngine
+import com.stillwater.app.domain.TideSnapshot
 import com.stillwater.app.domain.model.EntryPoint
 import com.stillwater.app.domain.model.UrgeOutcome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -29,6 +32,8 @@ data class ProgressUiState(
     val recoveryImproving: Boolean? = null,
     val hasAnyData: Boolean = false,
     val lapseCount: Int = 0,
+    /** The tide engine's learned pattern, in calm sentences. Empty = still learning. */
+    val patternLines: List<String> = emptyList(),
 )
 
 private const val WEEKS_SHOWN = 6
@@ -36,15 +41,40 @@ private const val WEEKS_SHOWN = 6
 @HiltViewModel
 class ProgressViewModel @Inject constructor(
     urgeDao: UrgeDao,
+    riskRepository: RiskRepository,
 ) : ViewModel() {
 
-    val uiState: StateFlow<ProgressUiState> = urgeDao.getResolvedEvents()
-        .map(::compute)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ProgressUiState(),
-        )
+    private val topTrigger = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+
+    val uiState: StateFlow<ProgressUiState> = kotlinx.coroutines.flow.combine(
+        urgeDao.getResolvedEvents(),
+        riskRepository.snapshot,
+        topTrigger,
+    ) { events, snapshot, trigger ->
+        compute(events).copy(patternLines = patternLines(snapshot, trigger))
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = ProgressUiState(),
+    )
+
+    init {
+        viewModelScope.launch { topTrigger.value = riskRepository.topTriggerName() }
+    }
+
+    private fun patternLines(snapshot: TideSnapshot, trigger: String?): List<String> {
+        if (!snapshot.hasSignal) return emptyList()
+        return buildList {
+            RiskEngine.tideLine(snapshot)?.let(::add)
+            snapshot.topMood?.let {
+                add("Most of your waves ride in on feeling ${it.name.lowercase()}.")
+            }
+            trigger?.let { add("Your most common spark: ${it.lowercase()}.") }
+            snapshot.typicalWaveMinutes?.let {
+                add("Once you start surfing, waves typically pass in about $it minutes.")
+            }
+        }
+    }
 
     private fun compute(events: List<ResolvedEvent>): ProgressUiState {
         val now = Instant.now()

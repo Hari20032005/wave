@@ -62,6 +62,14 @@ fun HomeScreen(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        if (state.tideLine != null) {
+            Spacer(Modifier.height(Spacing.sm))
+            Text(
+                text = state.tideLine!!,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
 
         Spacer(Modifier.height(Spacing.huge))
 

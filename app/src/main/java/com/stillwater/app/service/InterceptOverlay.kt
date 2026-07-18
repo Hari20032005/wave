@@ -59,6 +59,7 @@ class InterceptOverlay(private val context: Context) {
 
     fun show(
         appLabel: String,
+        memoryLine: String? = null,
         onSurf: () -> Unit,
         onSkip: () -> Unit,
         onContinue: () -> Unit,
@@ -73,6 +74,7 @@ class InterceptOverlay(private val context: Context) {
                 StillwaterTheme(darkTheme = true) {
                     InterceptContent(
                         appLabel = appLabel,
+                        memoryLine = memoryLine,
                         onSurf = onSurf,
                         onSkip = onSkip,
                         onContinue = onContinue,
@@ -112,6 +114,7 @@ class InterceptOverlay(private val context: Context) {
 @Composable
 private fun InterceptContent(
     appLabel: String,
+    memoryLine: String?,
     onSurf: () -> Unit,
     onSkip: () -> Unit,
     onContinue: () -> Unit,
@@ -139,6 +142,15 @@ private fun InterceptContent(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
+            if (memoryLine != null) {
+                Spacer(Modifier.height(Spacing.sm))
+                // The door remembers — the user's own recent record, factually.
+                Text(
+                    text = memoryLine,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Spacer(Modifier.height(Spacing.xxl))
             CalmPrimaryButton(text = "Surf it with me", onClick = onSurf, isCrisis = true)
             Spacer(Modifier.height(Spacing.md))

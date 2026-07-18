@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.stillwater.app.data.PlanRepository
+import com.stillwater.app.data.RiskRepository
 import com.stillwater.app.data.TriggerRepository
+import com.stillwater.app.domain.RiskEngine
 import com.stillwater.app.data.UrgeRepository
 import com.stillwater.app.data.UserValuesRepository
 import com.stillwater.app.data.prefs.UserPreferencesRepository
@@ -48,6 +50,8 @@ data class SosUiState(
     val phase: SosPhase = SosPhase.BREATHE,
     val surfElapsedSeconds: Int = 0,
     val values: List<String> = emptyList(),
+    /** Personal evidence from their own history ("waves pass in ~6 min for you"). */
+    val personalEvidence: String? = null,
     /** The user's active if-then plan, shown back at step 3. */
     val plan: IfThenPlan? = null,
     /** Profile mode; BOTH means the log asks which pull it was. */
@@ -88,6 +92,7 @@ class SosViewModel @Inject constructor(
     private val urgeRepository: UrgeRepository,
     private val triggerRepository: TriggerRepository,
     private val planRepository: PlanRepository,
+    riskRepository: RiskRepository,
     valuesRepository: UserValuesRepository,
     preferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
@@ -118,7 +123,15 @@ class SosViewModel @Inject constructor(
             val prefs = preferencesRepository.userPreferences.first()
             val values = valuesRepository.values.first().map { it.name }
             val plan = planRepository.currentPlan()
-            _uiState.update { it.copy(profileMode = prefs.mode, values = values, plan = plan) }
+            val evidence = RiskEngine.surfEvidence(riskRepository.snapshot.first())
+            _uiState.update {
+                it.copy(
+                    profileMode = prefs.mode,
+                    values = values,
+                    plan = plan,
+                    personalEvidence = evidence,
+                )
+            }
             eventId = urgeRepository.startEvent(entryPoint, prefs.mode, route.interceptedPackage)
         }
         viewModelScope.launch {

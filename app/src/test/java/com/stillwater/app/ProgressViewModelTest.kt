@@ -2,6 +2,7 @@ package com.stillwater.app
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.stillwater.app.data.RiskRepository
 import com.stillwater.app.data.db.EventTriggerEntity
 import com.stillwater.app.data.db.LapseDebriefEntity
 import com.stillwater.app.data.db.ResolvedEvent
@@ -24,6 +25,12 @@ private class FakeUrgeDao(
     val resolved = MutableStateFlow(events)
 
     override fun getResolvedEvents(): Flow<List<ResolvedEvent>> = resolved
+    override fun getRiskEvents(): Flow<List<com.stillwater.app.domain.RiskEvent>> =
+        MutableStateFlow(emptyList())
+
+    override suspend fun topTriggerName(): String? = null
+    override suspend fun doorVisitsSince(packageName: String, sinceEpochMs: Long): Int = 0
+    override suspend fun doorWalkawaysSince(packageName: String, sinceEpochMs: Long): Int = 0
     override suspend fun insertEvent(event: UrgeEventEntity): Long = 0
     override suspend fun completeEvent(
         id: Long, endedAtEpochMs: Long, outcome: String, furthestStep: String?,
@@ -62,7 +69,7 @@ class ProgressViewModelTest {
                 event(0, "ABANDONED"),
             ),
         )
-        ProgressViewModel(dao).uiState.test {
+        ProgressViewModel(dao, RiskRepository(dao)).uiState.test {
             awaitItem() // initial empty
             val state = awaitItem()
             assertThat(state.totalSurfed).isEqualTo(2)
@@ -83,7 +90,7 @@ class ProgressViewModelTest {
                 ResolvedEvent(backAt.toEpochMilli(), "SURFED", "IN_APP"),
             ),
         )
-        ProgressViewModel(dao).uiState.test {
+        ProgressViewModel(dao, RiskRepository(dao)).uiState.test {
             awaitItem()
             val state = awaitItem()
             assertThat(state.lapseCount).isEqualTo(1)
@@ -94,7 +101,7 @@ class ProgressViewModelTest {
 
     @Test
     fun `no data yields the empty state, never fake numbers`() = runTest {
-        ProgressViewModel(FakeUrgeDao()).uiState.test {
+        FakeUrgeDao().let { ProgressViewModel(it, RiskRepository(it)) }.uiState.test {
             awaitItem()
             val state = awaitItem()
             assertThat(state.hasAnyData).isFalse()

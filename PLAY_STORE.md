@@ -31,12 +31,21 @@ Additional questions:
 **App name:** Stillwater — Digital Wellbeing & Focus
 
 **Short description (80 chars):**
-"A calm companion for urges and impulse control. Private: nothing leaves your phone."
+"The calm urge app that learns your pattern — entirely on your phone."
 
 **Full description (draft):**
 Stillwater helps you change your relationship with the apps and habits that
 pull at you. Instead of streaks and shame, it gives you help in the moment the
-urge rises:
+urge rises — and unlike any other app, it learns YOUR pattern without your
+data ever leaving the phone:
+
+- It learns your tide: your personal high-risk hour, your most common
+  triggers, how long your waves really last — computed on-device from your
+  own logs, never uploaded, because there is nothing to upload to
+- At the hard moment it shows your own evidence, not platitudes: "Waves
+  usually pass in about 6 minutes for you. You've surfed 3 of your last 4."
+- The pause screen remembers: "Third time at this door tonight — you walked
+  away twice."
 
 - A one-tap SOS flow: a breathing pause, 90 seconds of guided urge-surfing,
   and your own if-then plan shown back to you when you need it
